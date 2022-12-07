@@ -1,0 +1,53 @@
+
+
+x and y are ints AND x is not equal to y
+
+S = (x AND y = int) AND x != y
+R = (a > b)
+
+(if)
+let S: a := x, b := y
+let R: a > b
+wp(S,R) = wp((a := x, b := y), a > b) = wp(a := x, a > b) = wp(a := x, x > b) = wp(x > b, x > b) = x > b
+This program satisfies its postcondition if x > y
+
+
+wp (if x > y then S1 else S2, R) = 
+(x > y --> wp (S1, R)) /\ (not(x > y) --> wp (S2, R)
+Let S: 
+
+if x > y then S1 else S2
+
+Let S1: a := x, b := y
+Let S2: a := y, b := x
+
+Let R: a > b
+
+wp (if x > y then S1 else S2, R) =
+(By Conditional Rule)
+(x > y --> wp (S1, R)) /\ (not(x > y) --> wp (S2, R))
+(By Assignment Rule)
+(x > y --> x > y) /\ (not(x > y) --> y > x)
+false! Because x could be equal to y.
+This program does not satisfy its postcondition in S2 if x == y
+
+
+wp(x := e,R ) = R [x → e] <- ASSIGNMENT RULE
+wp (S1;S2,R) = wp (S1, wp (S2, R)) <- SEQUENTIAL RULE
+
+let S: a := x, b := y
+let R: a > b
+wp(a := x; b := y, a > b) = (SEQUENTIAL RULE)
+wp(a := x, wp(b := y, a > b)) = (ASSIGNMENT RULE)
+wp(a := x, a > y) = (ASSIGNMENT RULE)
+x > y
+
+FIRST IF IS SATISFIED IF x > y
+
+
+let S: if x > y then a := x, b := y else a := y, b := x
+let R: a > b
+
+wp(if (x > y) then a := x, b := y else a := y, b := x, a > b) = (CONDITIONAL RULE)
+x > y -> wp(a := x, b := y, a > b) /\ not(x > y) -> wp(a := y, b := x, a > b) = (ASSIGNMENT RULE)
+(x > y -> x > y) /\ (not(x > y) -> y > x) = FALSE because x could be equal to y so the whole thing is false 
