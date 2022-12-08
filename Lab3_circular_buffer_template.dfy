@@ -118,7 +118,7 @@ class CircularMemory
   }
   // Question 3 for Lab 4
   method DoubleCapacity()
-    modifies this;
+    modifies this
     requires cells.Length > 0
     requires cells.Length < 2147483647 / 2
     requires Valid()
@@ -126,8 +126,9 @@ class CircularMemory
     ensures cells.Length == 2 * old(cells.Length)
     ensures read_position == old(read_position)
     ensures write_position == old(write_position)
-    ensures forall j : int :: 0 <= j < old(cells.Length) ==> cells[j] == old(cells[j])
-    ensures forall j : int :: old(cells.Length) <= j < cells.Length ==> cells[j] == 0
+    ensures cells.Length > old(cells.Length)
+    ensures forall j : nat :: 0 <= j < old(cells.Length) ==> cells[j] == old(cells[j])
+    ensures forall j : nat :: old(cells.Length) <= j < cells.Length ==> cells[j] == 0
     
   {
     // one or more loops to double the capacity of cells
@@ -137,26 +138,84 @@ class CircularMemory
 
     var i := 0;
 
-    while(i < cells.Length)
-      invariant newCells.Length == 2 * old(cells.Length)
-      invariant forall j : nat :: 0 <= j <= i ==> newCells.Length > j
-      invariant 0 <= i <= cells.Length
-      invariant forall j : nat :: 0 <= j < i ==> newCells[j] == cells[j]
-      invariant forall j : int :: i <= j < newCells.Length ==> newCells[j] == 0
-      invariant forall j : int :: cells.Length <= j < newCells.Length ==> newCells[j] == 0
-      //invariant 0 <= j <= cells.Length;  
-      invariant cells.Length == old(cells.Length)
-      invariant read_position == old(read_position)
-      invariant write_position == old(write_position)
-      invariant forall j : int :: 0 <= j < old(cells.Length) ==> cells[j] == old(cells[j])
-      invariant forall j : int :: old(cells.Length) <= j < cells.Length ==> cells[j] == 0
+    while (i < cells.Length)
+    modifies newCells
+    decreases cells.Length - i
+    invariant newCells.Length > cells.Length
+    invariant 0 <= i <= cells.Length
+    invariant cells.Length == old(cells.Length)
+    invariant cells == old(cells)
+    invariant newCells.Length == 2 * cells.Length
+    invariant forall j : nat :: 0 <= j < i ==> cells[j] == old(cells[j])
+    invariant forall j : nat :: 0 <= j < i ==> newCells[j] == old(cells[j])
     {
       newCells[i] := cells[i];
       i := i + 1;
 
+    } 
+    while (i < newCells.Length)
+    modifies newCells
+    decreases newCells.Length - i
+    invariant newCells.Length > cells.Length
+    invariant cells.Length <= i <= newCells.Length
+    invariant cells.Length == old(cells.Length)
+    invariant newCells.Length == 2 * cells.Length
+    invariant cells == old(cells)
+    invariant forall j : nat :: cells.Length <= j < i ==> newCells[j] == 0
+    
+    {
+      newCells[i] := 0;
+      i := i + 1;
     }
+    // update the fields of the circular memory
+    
     cells := newCells;
     
 
   }
+
+/*
+method DoubleCapacity1()
+  modifies this;
+  requires cells.Length > 0
+  requires cells.Length < 2147483647 / 2
+  requires Valid()
+  ensures Valid()
+  ensures cells.Length == 2 * old(cells.Length)
+  ensures read_position == old(read_position)
+  ensures write_position == old(write_position)
+  ensures cells.Length > old(cells.Length)
+  ensures forall j : nat :: 0 <= j < old(cells.Length) ==> cells[j] == old(cells[j])
+  ensures forall j : nat :: old(cells.Length) <= j < cells.Length ==> cells[j] == 0
+{
+  // initialize new circular memory with double capacity
+  var newCells : array<int> := new int[2 * cells.Length];
+  var k := 0;
+  while (k < newCells.Length)
+  decreases newCells.Length - k
+  invariant cells == old(cells)
+  {
+    newCells[k] := 0;
+    k := k + 1;
+  }
+
+  // copy old cells to new cells
+  var i := 0;
+  while (i < cells.Length)
+  modifies newCells
+  decreases cells.Length - i
+  invariant newCells.Length > cells.Length
+  invariant 0 <= i <= cells.Length
+  invariant cells.Length == old(cells.Length)
+  invariant newCells.Length == 2 * cells.Length
+  invariant forall j : nat :: 0 <= j < i ==> newCells[j] == old(cells[j])
+  {
+    newCells[i] := cells[i];
+    i := i + 1;
+  }
+
+  // update the fields of the circular memory
+  cells := newCells;
+}
+*/
 }

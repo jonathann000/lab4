@@ -1,0 +1,54 @@
+
+wp(x := e,R ) = R [x → e] <- ASSIGNMENT RULE
+wp (S1;S2,R) = wp (S1, wp (S2, R)) <- SEQUENTIAL RULE
+
+Q = n > 0
+I  = res == fact(i-1);
+
+            (1)
+Q -> wp(S1,I) Innan loopen
+n > 0 -> wp(var i := 2; res := 1, res == fact(i-1) /\ i <= n+1)
+by Assignment Rule (res := 1; var i := 2)
+n > 0 -> 1 == fact(2-1) /\ 2 <= n+1
+True
+            (2)
+I /\ B -> wp(S,I) i loopen
+(res == fact(i-1) /\ i <= n+1) /\ i <= n -> wp( i := i + 1; res := res * i, res == fact(i-1) /\ i <= n+1)
+by SEQUENTIAL RULE 
+(res == fact(i-1) /\ i <= n+1) /\ i <= n -> wp(i := i + 1, wp(res := res * i, res == fact(i-1) /\ i <= n+1))
+By Assignment Rule (res := res * i)
+(res == fact(i-1) /\ i <= n+1) /\ i <= n -> wp(i := i +1 , res * i == fact(i-1) /\ i <= n+1)
+By Assignment Rule (i := i + 1)
+(res == fact(i-1) /\ i <= n+1) /\ i <= n -> res * i == fact(i) /\ i+1 <= n+1
+res * i == fact(i - 1) * i == fact(i) first statement is true but
+since i > n -> could be false but it is good because we then leave the loop
+
+            (3)
+I /\ not(B) -> wp(S2,R) efter loopen
+(res == fact(i-1) /\ i <= n+1) /\ i > n -> wp(skip, fact(n) == res)
+by Assignment Rule (skip)
+(res == fact(i-1) /\ i <= n+1) /\ i > n -> fact(n) == res
+
+            (4)
+I /\ B -> V >= 0 variant is bounded from below 0 and is positive while loop is running
+variant V = n - i
+(res == fact(i-1) /\ i <= n+1) /\ i <= n -> n - 1 >= 0 
+B -> i <= n -> n - i >= 0
+<-> B -> V >= 0 
+True :)
+            (5)
+I ∧ B -> wp(Vold := V; S, V < Vold) variant is decreasing
+(res == fact(i-1) /\ i <= n+1) /\ i <= n -> wp(Vold := n - i; res := res * i; i := i + 1, n - i < Vold)
+by SEQUENTIAL RULE
+(res == fact(i-1) /\ i <= n+1) /\ i <= n -> wp(Vold := n - i, wp(res := res * i; i := i + 1, n - i < Vold)
+by SEQUENTIAL RULE (we change "res := res * i" to skip because it is not relevant for our proof)
+(res == fact(i-1) /\ i <= n+1) /\ i <= n -> wp(Vold := n - i, wp(i := i + 1, wp(skip, n - i < Vold)))
+by Assignment Rule (skip)
+by Assignment Rule (i := i + 1)
+(res == fact(i-1) /\ i <= n+1) /\ i <= n -> wp(Vold := n - i, n - (i + 1) < Vold))
+by Assignment Rule (Vold := n - i)
+(res == fact(i-1) /\ i <= n+1) /\ i <= n -> n - (i + 1) = n - 2 < n - 1
+Trivially true :)
+
+
+

@@ -11,7 +11,6 @@ function fact(n: nat): nat
 
 
 method ComputeFact(n : nat) returns (res : nat)
-  
   requires n > 0;
   ensures fact(n) == res;
  {
@@ -19,15 +18,15 @@ method ComputeFact(n : nat) returns (res : nat)
   var i := 2;
 
   while i <= n
-    invariant 1 <= res;
+    decreases n - i;
     invariant res == fact(i-1);
-    invariant i > 0;
     invariant i <= n+1;
-
   {
-    res := res * i;   
-    i := i + 1;    
+    res := res * i;
+    i := i + 1;
   }
  }
+
+ 
 
 
