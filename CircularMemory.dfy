@@ -34,9 +34,9 @@ class CircularMemory
     //same with read position
     0 <= read_position < cells.Length && 
     //if the array is flipped, the write position needs to be greater than the read position
-    isFlipped ==> write_position <= read_position && 
+    (isFlipped ==> write_position <= read_position) && 
     //if the array is not flipped, the write position needs to be less than the read position
-    !isFlipped ==> write_position >= read_position
+    (!isFlipped ==> write_position >= read_position)
   }
 
   predicate isEmpty()
